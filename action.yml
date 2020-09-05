@@ -1,0 +1,31 @@
+name: 'No Free Usage Action'
+description: 'A NO-FREE-USAGE Bot for github. (Only worked with github action.)'
+inputs:
+  forked:
+    description: 'Whether required user forked the repository. Use --no-forked to disable.'
+    required: false
+    default: '-f'
+  starred:
+    description: 'Whether required user starred the repository. Use --no-starred to disable.'
+    required: false
+    default: '-s'
+  token:
+    description: 'secrets.GITHUB_TOKEN'
+    required: true
+  event_path:
+    description: 'GITHUB_EVENT_PATH'
+    required: false
+    default: '/github/workflow/event.json'
+  words:
+    description: 'Reply content when closing.'
+    required: false
+    default: 'Please file the issue after you starred and forked the repo. Thanks! 🙂'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.forked }}
+    - ${{ inputs.starred }}
+    - ${{ inputs.token }}
+    - ${{ inputs.event_path }}
+    - ${{ inputs.words }}
