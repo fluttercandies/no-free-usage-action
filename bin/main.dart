@@ -45,9 +45,8 @@ Future<void> main(List<String> args) async {
 
   final IssueEvent event = IssueEvent.fromJson(await readEvent(results));
 
+  Constants.event = event;
   Constants.token = results['token'] as String;
-  Constants.login = event.issue.user.login;
-  Constants.fullRepoName = event.repository.full_name;
   Constants.isForkRequired = results['forked'] as bool;
   Constants.isStarRequired = results['starred'] as bool;
   Constants.words = results['words'] as String;

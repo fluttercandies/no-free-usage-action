@@ -11,7 +11,7 @@ Future<bool> tips() async {
         '/issues/${Constants.event.issue.number}/comments',
     fetchType: FetchType.post,
     body: <String, dynamic>{
-      'body': tips,
+      'body': Constants.words,
     },
     headers: <String, dynamic>{'Authorization': 'Bearer ${Constants.token}'},
   );

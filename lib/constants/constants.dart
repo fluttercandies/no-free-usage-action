@@ -18,8 +18,8 @@ class Constants {
   static IssueEvent event;
 
   static String token;
-  static String login;
-  static String fullRepoName;
+  static String get login => event.issue.user.login;
+  static String get fullRepoName => event.repository.full_name;
   static bool isForkRequired;
   static bool isStarRequired;
   static String words = 'Please file the issue after you starred and forked the repo. Thanks! 🙂';
