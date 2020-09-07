@@ -73,8 +73,11 @@ Future<bool> forksCheck({
     if (filteredForks?.isNotEmpty ?? false) {
       isForked = true;
     } else {
+      if (forksCount <= 100) {
+        return;
+      }
       page++;
-      forksCount -= forks.length;
+      forksCount -= forks?.length;
       await requestForked();
     }
   }
@@ -106,8 +109,11 @@ Future<bool> starredCheck({
     if (filteredStargazers?.isNotEmpty ?? false) {
       isStarred = true;
     } else {
+      if (stargazersCount <= 100) {
+        return;
+      }
       page++;
-      stargazersCount -= stargazers.length;
+      stargazersCount -= stargazers?.length;
       await requestStarred();
     }
   }
