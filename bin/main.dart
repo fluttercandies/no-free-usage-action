@@ -37,7 +37,7 @@ Future<void> main(List<String> args) async {
       'words',
       abbr: 'w',
       help: 'Reply content.',
-      defaultsTo: 'Please file the issue after you starred and forked the repo. Thanks! 🙂',
+      defaultsTo: Constants.words,
     )
     ..addFlag('help', abbr: 'h', help: 'Help usage', defaultsTo: false);
 
@@ -45,5 +45,12 @@ Future<void> main(List<String> args) async {
 
   final IssueEvent event = IssueEvent.fromJson(await readEvent(results));
 
-  await check(args: results, event: event);
+  Constants.token = results['token'] as String;
+  Constants.login = event.issue.user.login;
+  Constants.fullRepoName = event.repository.full_name;
+  Constants.isForkRequired = results['forked'] as bool;
+  Constants.isStarRequired = results['starred'] as bool;
+  Constants.words = results['words'] as String;
+
+  await check();
 }

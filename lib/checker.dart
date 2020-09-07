@@ -6,13 +6,8 @@ import 'package:no_free_action/constants/constants.dart';
 
 import 'action.dart';
 
-Future<void> check({
-  ArgResults args,
-  IssueEvent event,
-}) async {
-  final bool isForkRequired = args['forked'] as bool;
-  final bool isStarRequired = args['starred'] as bool;
-  if (!isForkRequired && !isStarRequired) {
+Future<void> check() async {
+  if (!Constants.isForkRequired && !Constants.isStarRequired) {
     print('Nothing to check. Phew!');
     return;
   }
@@ -22,9 +17,9 @@ Future<void> check({
   final String fullRepoName = event.repository.full_name;
 
   final Repository repo = await HttpUtils.fetch<Repository>(
-    url: '$baseUrl/repos/$fullRepoName',
+    url: '$baseUrl/repos/${Constants.fullRepoName}',
     fetchType: FetchType.get,
-    headers: <String, dynamic>{'Authorization': 'Bearer $token'},
+    headers: <String, dynamic>{'Authorization': 'Bearer ${Constants.token}'},
   );
   if (repo == null) {
     return;
@@ -60,30 +55,19 @@ Future<void> check({
   final bool isForked = filteredForks?.isNotEmpty ?? false;
   final bool isStarred = filteredStargazers?.isNotEmpty ?? false;
   print(
-    '\nUser    : $login'
+    '\nUser    : ${Constants.login}'
     '\nForked  : $isForked'
     '\nStarred : $isStarred'
     '\n',
   );
 
-  if ((isForkRequired && !isForked) || (isStarRequired && !isStarred)) {
-    final bool isCommented = await tips(
-      token: token,
-      event: event,
-      repo: fullRepoName,
-      tips: args['words'] as String,
-    );
+  if ((Constants.isForkRequired && !isForked) ||
+      (Constants.isStarRequired && !isStarred)) {
+    final bool isCommented = await tips();
     if (isCommented) {
-      final bool isClosed = await close(
-        token: token,
-        event: event,
-      );
+      final bool isClosed = await close();
       if (isClosed) {
-        await lock(
-          token: token,
-          event: event,
-          repo: fullRepoName,
-        );
+        await lock();
       }
     }
   }
