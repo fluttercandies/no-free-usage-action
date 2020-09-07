@@ -1,7 +1,8 @@
 name: 'No Free Usage Action'
 description: 'A NO-FREE-USAGE Bot for github. (Only worked with github action.)'
-icon: 'bell-off'
-color: 'red'
+branding:
+  icon: 'bell-off'
+  color: 'red'
 inputs:
   forked:
     description: 'Whether required user forked the repository. Use --no-forked to disable.'
