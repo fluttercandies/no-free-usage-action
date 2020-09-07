@@ -2,6 +2,9 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2020-09-05 14:00
 ///
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:no_free_action/constants/constants.dart';
 
 import 'action.dart';
@@ -12,10 +15,6 @@ Future<void> check() async {
     return;
   }
 
-  final String token = args['token'] as String;
-  final String login = event.issue.user.login;
-  final String fullRepoName = event.repository.full_name;
-
   final Repository repo = await HttpUtils.fetch<Repository>(
     url: '$baseUrl/repos/${Constants.fullRepoName}',
     fetchType: FetchType.get,
@@ -25,35 +24,13 @@ Future<void> check() async {
     return;
   }
   final List<dynamic> requests = await Future.wait(<Future>[
-    HttpUtils.fetchModels<Repository>(
-      url: repo.forks_url,
-      fetchType: FetchType.get,
-      queryParameters: <String, dynamic>{
-        'per_page': repo.forks_count,
-      },
-      headers: <String, dynamic>{'Authorization': 'Bearer $token'},
-    ),
-    HttpUtils.fetchModels<User>(
-      url: repo.stargazers_url,
-      fetchType: FetchType.get,
-      queryParameters: <String, dynamic>{
-        'per_page': repo.stargazers_count,
-      },
-      headers: <String, dynamic>{'Authorization': 'Bearer $token'},
-    ),
+    forksCheck(repo: repo),
+    starredCheck(repo: repo),
   ]);
 
-  final List<Repository> forks = requests[0] as List<Repository>;
-  final List<User> stargazers = requests[1] as List<User>;
-  final Iterable<Repository> filteredForks = forks?.where((Repository repo) {
-    return repo.full_name.contains(login);
-  });
-  final Iterable<User> filteredStargazers = stargazers?.where((User user) {
-    return user.login.contains(login);
-  });
+  final bool isForked = requests[0] as bool;
+  final bool isStarred = requests[1] as bool;
 
-  final bool isForked = filteredForks?.isNotEmpty ?? false;
-  final bool isStarred = filteredStargazers?.isNotEmpty ?? false;
   print(
     '\nUser    : ${Constants.login}'
     '\nForked  : $isForked'
@@ -71,4 +48,70 @@ Future<void> check() async {
       }
     }
   }
+}
+
+Future<bool> forksCheck({
+  @required Repository repo,
+}) async {
+  bool isForked = false;
+  int page = 1;
+  int forksCount = repo.forks_count;
+
+  Future<void> requestForked() async {
+    final List<Repository> forks = await HttpUtils.fetchModels<Repository>(
+      url: repo.forks_url,
+      fetchType: FetchType.get,
+      queryParameters: <String, dynamic>{
+        'page': page,
+        'per_page': math.min(100, forksCount),
+      },
+      headers: <String, dynamic>{'Authorization': 'Bearer ${Constants.token}'},
+    );
+    final Iterable<Repository> filteredForks = forks?.where((Repository repo) {
+      return repo.full_name.contains(Constants.login);
+    });
+    if (filteredForks?.isNotEmpty ?? false) {
+      isForked = true;
+    } else {
+      page++;
+      forksCount -= forks.length;
+      await requestForked();
+    }
+  }
+
+  await requestForked();
+  return isForked;
+}
+
+Future<bool> starredCheck({
+  @required Repository repo,
+}) async {
+  bool isStarred = false;
+  int page = 1;
+  int stargazersCount = repo.stargazers_count;
+
+  Future<void> requestStarred() async {
+    final List<User> stargazers = await HttpUtils.fetchModels<User>(
+      url: repo.stargazers_url,
+      fetchType: FetchType.get,
+      queryParameters: <String, dynamic>{
+        'page': page,
+        'per_page': math.min(100, stargazersCount),
+      },
+      headers: <String, dynamic>{'Authorization': 'Bearer ${Constants.token}'},
+    );
+    final Iterable<User> filteredStargazers = stargazers?.where((User user) {
+      return user.login.contains(Constants.login);
+    });
+    if (filteredStargazers?.isNotEmpty ?? false) {
+      isStarred = true;
+    } else {
+      page++;
+      stargazersCount -= stargazers.length;
+      await requestStarred();
+    }
+  }
+
+  await requestStarred();
+  return isStarred;
 }

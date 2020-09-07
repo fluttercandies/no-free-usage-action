@@ -134,8 +134,9 @@ class Repository extends DataModel {
       labels_url: json['labels_url'] as String,
       language: json['language'] as String,
       languages_url: json['languages_url'] as String,
-      license:
-          json['license'] != null ? License.fromJson(json['license'] as Map<String, dynamic>) : null,
+      license: json['license'] != null
+          ? License.fromJson(json['license'] as Map<String, dynamic>)
+          : null,
       merges_url: json['merges_url'] as String,
       milestones_url: json['milestones_url'] as String,
       mirror_url: json['mirror_url'] as String,
@@ -148,7 +149,9 @@ class Repository extends DataModel {
       organization: json['organization'] != null
           ? Organization.fromJson(json['organization'] as Map<String, dynamic>)
           : null,
-      owner: json['owner'] != null ? User.fromJson(json['owner'] as Map<String, dynamic>) : null,
+      owner: json['owner'] != null
+          ? User.fromJson(json['owner'] as Map<String, dynamic>)
+          : null,
       pulls_url: json['pulls_url'] as String,
       pushed_at: json['pushed_at'] as String,
       releases_url: json['releases_url'] as String,
