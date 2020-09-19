@@ -1,6 +1,6 @@
 name: no_free_action
 description: A NO-FREE-USAGE Bot for github. (Only worked with github action.)
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/fluttercandies/no-free-usage-action
 
 environment:
