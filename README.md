@@ -29,7 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Check issue actor
-      uses: fluttercandies/no-free-usage-action@1.0.1
+      uses: fluttercandies/no-free-usage-action@v1.0.1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 ```
